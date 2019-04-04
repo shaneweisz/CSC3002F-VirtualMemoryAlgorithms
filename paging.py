@@ -7,11 +7,11 @@ from random import randint
 
 def FIFO(size, pages):
     """
-    Function that returns the number of page faults using the FIFO
-    page replacement algorithm.
+    Function that implements the FIFO page replacement algorithm and
+    returns the number of page faults that occur.
 
     Parameters:
-        size (int): The number of available frames - should be between 1 and 7
+        size (int): The number of available page frames - can vary from 1 to 7
         pages (list): A page reference string e.g. [1, 2, 3, 5, 1, 2, 3, 5]
 
     Returns:
@@ -36,11 +36,11 @@ def FIFO(size, pages):
 
 def LRU(size, pages):
     """
-    Function that returns the number of page faults using the LRU
-    (Least Recently Used) page replacement algorithm.
+    Function that implements the LRU (Least Recently Used) page replacement
+    algorithm and returns the number of page faults that occur.
 
     Parameters:
-        size (int): The number of available frames - should be between 1 and 7
+        size (int): The number of available page frames - can vary from 1 to 7
         pages (list): A page reference string e.g. [1, 2, 3, 5, 1, 2, 3, 5]
 
     Returns:
@@ -70,11 +70,11 @@ def LRU(size, pages):
 
 def OPT(size, pages):
     """
-    Function that returns the number of page faults using the OPT
-    (Optimal) page replacement algorithm.
+    Function that implements the optimal page replacement algorithm (OPT)
+    and returns the number of page faults that occur.
 
     Parameters:
-        size (int): The number of available frames - should be between 1 and 7
+        size (int): The number of available page frames - can vary from 1 to 7
         pages (list): A page reference string e.g. [1, 2, 3, 5, 1, 2, 3, 5]
 
     Returns:
@@ -123,20 +123,34 @@ def OPT(size, pages):
     return page_faults
 
 
-def main():
-    # Generates a random page-reference string where page nos range from 0 to 9
-    N = int(input("Enter the size of the page reference string: "))
-    pages = []                           # The page-reference string itself
-    for i in range(N):                  # Assume 20 pages in page ref str
-        pages.append(randint(0, 9))      # Generates a random number from [0,9]
+def generate_page_reference_string(N):
+    """
+    Generates a random page-reference string of length N
+    where page numbers range from 0 to 9
 
-    # pages = [7, 0, 1, 2, 0, 3, 0, 4, 2, 3, 0, 3, 2, 1, 2, 0, 1, 7, 0, 1]
+    Parameters:
+        N (int): The desired length of the page reference string
+
+    Returns:
+        list: a list of page references e.g. [0,2,4,1,2,3]
+    """
+    pages = []                          # Stores the page-reference string
+    for i in range(N):
+        pages.append(randint(0, 9))     # Generates a random number from [0,9]
+    return pages
+
+
+def main():
+    # N = int(input("Enter the size of the page reference string: "))
+    # generate_page_reference_string(N)
+
+    pages = [7, 0, 1, 2, 0, 3, 0, 4, 2, 3, 0, 3, 2, 1, 2, 0, 1, 7, 0, 1]
     # pages = [8, 5, 6, 2, 5, 3, 5, 4, 2, 3, 5, 3, 2, 6, 2, 5,
     #          6, 8, 5, 6, 2, 3, 4, 2, 1, 3, 7, 5, 4, 3, 1, 5]
     # pages = [1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5]
 
-    # Apply the random page-reference string to each algorithm,
-    # and record the number of page faults incurred by each algorithm.
+    # The random page-reference string is applied to each algorithm,
+    # and the number of page faults incurred by each algorithm is recorded.
     size = int(sys.argv[1])  # number of pages
     print "FIFO", FIFO(size, pages), "page faults."
     print "LRU", LRU(size, pages), "page faults."
