@@ -31,7 +31,27 @@ def FIFO(size, pages):
 def LRU(size, pages):
     # size:  number of available frames
     # pages: page reference string
-    pass
+
+    stack = []                   # stack is initially empty
+    page_faults = 0              # tracks the number of page faults
+
+    for page in pages:           # loops through each page in the page ref str
+        if len(stack) < size:    # check if the stack is full
+            if page in stack:
+                # remove page from old place in stack, to be inserted at head
+                stack.remove(page)
+            else:
+                page_faults += 1    # page fault occurs since page not in stack
+        else:                    # the stack is now full
+            if page in stack:
+                stack.remove(page)  # remove page from old place in the stack
+            else:
+                page_faults += 1    # page fault occurs since page not in stack
+                del stack[size-1]   # remove the least recently used page
+        # Put this page on top of stack because its most recently used
+        stack.insert(0, page)
+
+    return page_faults
 
 
 # Function that returns the number of page faults using OPT
@@ -47,7 +67,7 @@ def main():
     for i in range(20):                  # Assume 20 pages in page ref str
         pages.append(randint(0, 9))      # Generates a random number from [0,9]
 
-    # pages = [7, 0, 1, 2, 0, 3, 0, 4, 2, 3, 0, 3, 2, 1, 2, 0, 1, 7, 0, 1]
+    pages = [7, 0, 1, 2, 0, 3, 0, 4, 2, 3, 0, 3, 2, 1, 2, 0, 1, 7, 0, 1]
     # pages = [1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5]
 
     # Apply the random page-reference string to each algorithm,
