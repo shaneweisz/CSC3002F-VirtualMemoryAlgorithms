@@ -8,7 +8,7 @@ from random import randint
 # Function that returns the number of page faults using FIFO
 def FIFO(size, pages):
     # size:  number of available frames - should be a value between 1 and 7
-    # pages: page reference string
+    # pages: page reference string e.g. [1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5]
 
     queue = []                   # queue is initially empty
     page_faults = 0              # tracks the number of page faults
@@ -30,7 +30,7 @@ def FIFO(size, pages):
 # Function that returns the number of page faults using LRU
 def LRU(size, pages):
     # size:  number of available frames - should be a value between 1 and 7
-    # pages: page reference string
+    # pages: page reference string e.g. [1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5]
 
     stack = []                   # stack is initially empty
     page_faults = 0              # tracks the number of page faults
@@ -56,33 +56,54 @@ def LRU(size, pages):
 
 # Function that returns the number of page faults using OPT
 def OPT(size, pages):
-    # size:  number of available frames
-    # pages: page reference string - should be a value between 1 and 7
+    # size:  number of available frames - should be a value between 1 and 7
+    # pages: page reference string e.g. [1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5]
 
     page_faults = 0              # tracks the number of page faults
     frames = []                  # represent frames in physical memory
 
-    for page in pages:           # loops through each page in the page ref str
-        if len(frames) < size:   # check if there are any free frames
+    for page_index, page in enumerate(pages):  # loop through the page ref str
+        if len(frames) < size:        # check if there are any free frames
             if page not in frames:
                 page_faults += 1      # a page fault has occurred
                 frames.append(page)   # place the new page in a free frame
         else:
             if page not in frames:
+                page_faults += 1    # page is not in the frames, so page fault
+
                 # we must replace the frame that will not be used for the
                 # longest period of time
                 frame_to_replace = frames[0]  # initialize to first frame
-                max_time_till_use = 0
-                upcoming_pages = pages  # upcoming pages to use
+                max_time_till_use = 0         # initialize to zero
+                upcoming_pages = pages[page_index+1:]
+
                 for frame in frames:
-                    pass
+                    # check if this frame has the current longest time till use
+                    for i, upcoming_page in enumerate(upcoming_pages):
+                        if frame == upcoming_page:
+                            time_till_use = i + 1  # since i starts at 0
+                            break
+                    else:
+                        # if we get here, this page frame is not referenced
+                        # anymore in the reference string,
+                        # so we have found our frame to replace
+                        frame_to_replace = frame
+                        break
+                    if time_till_use > max_time_till_use:
+                        max_time_till_use = time_till_use
+                        frame_to_replace = frame
+
+                # replace the old frame with the new page to access
+                pos = frames.index(frame_to_replace)
+                frames.remove(frame_to_replace)
+                frames.insert(pos, page)
 
     return page_faults
 
 
 def main():
     # Generates a random page-reference string where page nos range from 0 to 9
-    N = int(input("Enter the size of the page reference string: "))
+    N = 20  # int(input("Enter the size of the page reference string: "))
     pages = []                           # The page-reference string itself
     for i in range(N):                  # Assume 20 pages in page ref str
         pages.append(randint(0, 9))      # Generates a random number from [0,9]
