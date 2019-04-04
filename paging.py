@@ -7,7 +7,7 @@ from random import randint
 
 # Function that returns the number of page faults using FIFO
 def FIFO(size, pages):
-    # size:  number of available frames
+    # size:  number of available frames - should be a value between 1 and 7
     # pages: page reference string
 
     queue = []                   # queue is initially empty
@@ -29,7 +29,7 @@ def FIFO(size, pages):
 
 # Function that returns the number of page faults using LRU
 def LRU(size, pages):
-    # size:  number of available frames
+    # size:  number of available frames - should be a value between 1 and 7
     # pages: page reference string
 
     stack = []                   # stack is initially empty
@@ -57,17 +57,38 @@ def LRU(size, pages):
 # Function that returns the number of page faults using OPT
 def OPT(size, pages):
     # size:  number of available frames
-    # pages: page reference string
-    pass
+    # pages: page reference string - should be a value between 1 and 7
+
+    page_faults = 0              # tracks the number of page faults
+    frames = []                  # represent frames in physical memory
+
+    for page in pages:           # loops through each page in the page ref str
+        if len(frames) < size:   # check if there are any free frames
+            if page not in frames:
+                page_faults += 1      # a page fault has occurred
+                frames.append(page)   # place the new page in a free frame
+        else:
+            if page not in frames:
+                # we must replace the frame that will not be used for the
+                # longest period of time
+                frame_to_replace = frames[0]  # initialize to first frame
+                max_time_till_use = 0
+                upcoming_pages = pages  # upcoming pages to use
+                for frame in frames:
+                    pass
+
+    return page_faults
 
 
 def main():
     # Generates a random page-reference string where page nos range from 0 to 9
+    N = int(input("Enter the size of the page reference string: "))
     pages = []                           # The page-reference string itself
-    for i in range(20):                  # Assume 20 pages in page ref str
+    for i in range(N):                  # Assume 20 pages in page ref str
         pages.append(randint(0, 9))      # Generates a random number from [0,9]
 
     pages = [7, 0, 1, 2, 0, 3, 0, 4, 2, 3, 0, 3, 2, 1, 2, 0, 1, 7, 0, 1]
+    # pages = [8, 5, 6, 2, 5, 3, 5, 4, 2, 3, 5, 3, 2, 6, 2, 5]
     # pages = [1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5]
 
     # Apply the random page-reference string to each algorithm,
