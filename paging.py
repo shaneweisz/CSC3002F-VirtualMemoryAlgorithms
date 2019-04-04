@@ -5,11 +5,18 @@ import sys
 from random import randint
 
 
-# Function that returns the number of page faults using FIFO
 def FIFO(size, pages):
-    # size:  number of available frames - should be a value between 1 and 7
-    # pages: page reference string e.g. [1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5]
+    """
+    Function that returns the number of page faults using the FIFO
+    page replacement algorithm.
 
+    Parameters:
+        size (int): The number of available frames - should be between 1 and 7
+        pages (list): A page reference string e.g. [1, 2, 3, 5, 1, 2, 3, 5]
+
+    Returns:
+        int: The number of page faults that occured.
+    """
     queue = []                   # queue is initially empty
     page_faults = 0              # tracks the number of page faults
 
@@ -27,11 +34,18 @@ def FIFO(size, pages):
     return page_faults
 
 
-# Function that returns the number of page faults using LRU
 def LRU(size, pages):
-    # size:  number of available frames - should be a value between 1 and 7
-    # pages: page reference string e.g. [1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5]
+    """
+    Function that returns the number of page faults using the LRU
+    (Least Recently Used) page replacement algorithm.
 
+    Parameters:
+        size (int): The number of available frames - should be between 1 and 7
+        pages (list): A page reference string e.g. [1, 2, 3, 5, 1, 2, 3, 5]
+
+    Returns:
+        int: The number of page faults that occured.
+    """
     stack = []                   # stack is initially empty
     page_faults = 0              # tracks the number of page faults
 
@@ -54,10 +68,18 @@ def LRU(size, pages):
     return page_faults
 
 
-# Function that returns the number of page faults using OPT
 def OPT(size, pages):
-    # size:  number of available frames - should be a value between 1 and 7
-    # pages: page reference string e.g. [1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5]
+    """
+    Function that returns the number of page faults using the OPT
+    (Optimal) page replacement algorithm.
+
+    Parameters:
+        size (int): The number of available frames - should be between 1 and 7
+        pages (list): A page reference string e.g. [1, 2, 3, 5, 1, 2, 3, 5]
+
+    Returns:
+        int: The number of page faults that occured.
+    """
 
     page_faults = 0              # tracks the number of page faults
     frames = []                  # represent frames in physical memory
@@ -103,13 +125,14 @@ def OPT(size, pages):
 
 def main():
     # Generates a random page-reference string where page nos range from 0 to 9
-    N = 20  # int(input("Enter the size of the page reference string: "))
+    N = int(input("Enter the size of the page reference string: "))
     pages = []                           # The page-reference string itself
     for i in range(N):                  # Assume 20 pages in page ref str
         pages.append(randint(0, 9))      # Generates a random number from [0,9]
 
-    pages = [7, 0, 1, 2, 0, 3, 0, 4, 2, 3, 0, 3, 2, 1, 2, 0, 1, 7, 0, 1]
-    # pages = [8, 5, 6, 2, 5, 3, 5, 4, 2, 3, 5, 3, 2, 6, 2, 5]
+    # pages = [7, 0, 1, 2, 0, 3, 0, 4, 2, 3, 0, 3, 2, 1, 2, 0, 1, 7, 0, 1]
+    # pages = [8, 5, 6, 2, 5, 3, 5, 4, 2, 3, 5, 3, 2, 6, 2, 5,
+    #          6, 8, 5, 6, 2, 3, 4, 2, 1, 3, 7, 5, 4, 3, 1, 5]
     # pages = [1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5]
 
     # Apply the random page-reference string to each algorithm,
