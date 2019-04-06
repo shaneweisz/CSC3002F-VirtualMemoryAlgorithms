@@ -84,36 +84,54 @@ def OPT(size, pages):
             else:
                 # the frames are full, so we must replace the frame
                 # that will not be used for the longest period of time
-
-                frame_to_replace = frames[0]        # initialize to first frame
-                max_time_till_use = 0               # initialize to zero
                 upcoming_pages = pages[page_index+1:]
+                frame_to_replace = find_victim_frame(frames, upcoming_pages)
 
-                # loop through frames in memory to find the frame to replace
-                for frame in frames:
-                    # check if the frame will not be used in the near future
-                    # if so, we can replace this frame
-                    if frame not in upcoming_pages:
-                        frame_to_replace = frame
-                        break
-
-                    # find the next usage and time until the frame is next used
-                    for (i, upcoming_page) in enumerate(upcoming_pages, 1):
-                        if frame == upcoming_page:
-                            time_till_use = i
-                            break
-
-                    # check if this frame has the current longest time till use
-                    if time_till_use > max_time_till_use:
-                        max_time_till_use = time_till_use
-                        frame_to_replace = frame
-
-                # replace the chosen frame with the new page
+                # replace the victim frame with the new page
                 pos = frames.index(frame_to_replace)
                 frames.remove(frame_to_replace)
                 frames.insert(pos, page)
 
     return page_faults
+
+
+def find_victim_frame(frames, upcoming_pages):
+    """
+    Helper function for the OPT algorithm to find the the victim frame (frame
+    to replace) i.e. the frame that will not be used for the longest time.
+
+    Parameters:
+        frames (list): A list of the frames in memory e.g [0, 3, 5]
+        pages (list): A page reference string e.g. [1, 2, 3, 5, 1, 2, 3, 5]
+
+    Returns:
+        int: The frame that will not be used for the longest time - hence,
+             the frame to replace in the OPT algorithm
+    """
+
+    frame_to_replace = frames[0]        # initialize to first frame
+    max_time_till_use = 0               # initialize to zero
+
+    # loop through frames in memory to find the frame to replace
+    for frame in frames:
+        # check if the frame is never referenced in the future
+        # if so, we can replace this frame
+        if frame not in upcoming_pages:
+            frame_to_replace = frame
+            break
+
+        # find the next usage and time until the frame is next used
+        for (i, upcoming_page) in enumerate(upcoming_pages, 1):
+            if frame == upcoming_page:
+                time_till_use = i
+                break
+
+        # check if this frame has the current longest time till use
+        if time_till_use > max_time_till_use:
+            max_time_till_use = time_till_use
+            frame_to_replace = frame
+
+    return frame_to_replace
 
 
 def generate_page_reference_string(N):
@@ -130,7 +148,7 @@ def generate_page_reference_string(N):
 
     pages = []                          # Stores the page-reference string
     for i in range(N):
-        pages.append(randint(0, 9))     # Generates a random number from [0,9]
+        pages.append(randint(0, 9))     # Generates a random integer from 0-9
     return pages
 
 
@@ -141,15 +159,11 @@ def main():
     incurred by each algorithm is recorded.
     """
 
-    # N = int(input("Enter the length of the page reference string: "))
-    # generate_page_reference_string(N)
+    N = int(input("Enter the length of the page reference string: "))
+    pages = generate_page_reference_string(N)
+    print "Page reference string: ", pages
 
-    pages = [7, 0, 1, 2, 0, 3, 0, 4, 2, 3, 0, 3, 2, 1, 2, 0, 1, 7, 0, 1]
-    # pages = [8, 5, 6, 2, 5, 3, 5, 4, 2, 3, 5, 3, 2, 6, 2, 5,
-    #          6, 8, 5, 6, 2, 3, 4, 2, 1, 3, 7, 5, 4, 3, 1, 5]
-    # pages = [1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5]
-
-    size = int(sys.argv[1])  # number of pages
+    size = int(sys.argv[1])  # number of frames in memory
     print "FIFO", FIFO(size, pages), "page faults."
     print "LRU", LRU(size, pages), "page faults."
     print "OPT", OPT(size, pages), "page faults."
