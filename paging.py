@@ -5,6 +5,9 @@ import sys
 from random import randint
 
 
+# CONSIDER REORDERING LOOPS, PUT CHECK FOR PAGE IN QUEUE FIRST
+
+
 def FIFO(size, pages):
     """
     Function that implements the FIFO page replacement algorithm and
@@ -17,19 +20,16 @@ def FIFO(size, pages):
     Returns:
         int: The number of page faults that occured.
     """
-    queue = []                   # queue is initially empty
+
+    queue = []                   # queue, the page frames, is initially empty
     page_faults = 0              # tracks the number of page faults
 
     for page in pages:           # loops through each page in the page ref str
-        if len(queue) < size:    # check if the queue is full
-            if page not in queue:
-                page_faults += 1     # a page fault has occurred
-                queue.append(page)   # append the new page at end of queue
-        else:                    # the queue is now full
-            if page not in queue:
-                page_faults += 1     # a page fault has occurred
-                del queue[0]         # remove page at head of queue
-                queue.append(page)   # append the new page at end of queue
+        if page not in queue:    # check if the page is in memory already
+            page_faults += 1         # if not, a page fault has occurred
+            if len(queue) >= size:   # check if there are no empty frames left
+                del queue[0]            # if full, remove page at head of queue
+            queue.append(page)   # append the new page at end of queue
 
     return page_faults
 
@@ -46,23 +46,25 @@ def LRU(size, pages):
     Returns:
         int: The number of page faults that occured.
     """
-    stack = []                   # stack is initially empty
+
+    stack = []                   # stack, the page frames, is initially empty
     page_faults = 0              # tracks the number of page faults
 
     for page in pages:           # loops through each page in the page ref str
-        if len(stack) < size:    # check if the stack is full
+        if len(stack) < size:    # check if there are empty frames
             if page in stack:
                 # remove page from old place in stack, to be inserted at head
                 stack.remove(page)
             else:
                 page_faults += 1    # page fault occurs since page not in stack
-        else:                    # the stack is now full
+        else:                    # there are no empty frames left
             if page in stack:
                 stack.remove(page)  # remove page from old place in the stack
             else:
                 page_faults += 1    # page fault occurs since page not in stack
                 del stack[size-1]   # remove the least recently used page
-        # Put this page on top of stack because its most recently used
+        # Regardless of the outcomes of the above checks, we place the current
+        # page on top of the stack because its the most recently used page.
         stack.insert(0, page)
 
     return page_faults
@@ -134,6 +136,7 @@ def generate_page_reference_string(N):
     Returns:
         list: a list of page references e.g. [0,2,4,1,2,3]
     """
+
     pages = []                          # Stores the page-reference string
     for i in range(N):
         pages.append(randint(0, 9))     # Generates a random number from [0,9]
@@ -141,7 +144,13 @@ def generate_page_reference_string(N):
 
 
 def main():
-    # N = int(input("Enter the size of the page reference string: "))
+    """
+    A randomly generated page-reference string is applied to each of the FIFO,
+    LRU and optimal page replacement algorithms, and the number of page faults
+    incurred by each algorithm is recorded.
+    """
+
+    # N = int(input("Enter the length of the page reference string: "))
     # generate_page_reference_string(N)
 
     pages = [7, 0, 1, 2, 0, 3, 0, 4, 2, 3, 0, 3, 2, 1, 2, 0, 1, 7, 0, 1]
@@ -149,8 +158,6 @@ def main():
     #          6, 8, 5, 6, 2, 3, 4, 2, 1, 3, 7, 5, 4, 3, 1, 5]
     # pages = [1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5]
 
-    # The random page-reference string is applied to each algorithm,
-    # and the number of page faults incurred by each algorithm is recorded.
     size = int(sys.argv[1])  # number of pages
     print "FIFO", FIFO(size, pages), "page faults."
     print "LRU", LRU(size, pages), "page faults."
