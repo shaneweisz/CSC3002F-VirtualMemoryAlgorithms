@@ -51,20 +51,13 @@ def LRU(size, pages):
     page_faults = 0              # tracks the number of page faults
 
     for page in pages:           # loops through each page in the page ref str
-        if len(stack) < size:    # check if there are empty frames
-            if page in stack:
-                # remove page from old place in stack, to be inserted at head
-                stack.remove(page)
-            else:
-                page_faults += 1    # page fault occurs since page not in stack
-        else:                    # there are no empty frames left
-            if page in stack:
-                stack.remove(page)  # remove page from old place in the stack
-            else:
-                page_faults += 1    # page fault occurs since page not in stack
-                del stack[size-1]   # remove the least recently used page
-        # Regardless of the outcomes of the above checks, we place the current
-        # page on top of the stack because its the most recently used page.
+        if page not in stack:    # check if the page is in memory already
+            page_faults += 1        # if not, a page fault has occurred
+            if len(stack) >= size:  # check if there are no empty frames left
+                del stack[size-1]       # remove the least recently used page
+        else:                    # page is in memory
+            stack.remove(page)      # remove page from old place in stack
+        # put page on top of the stack because its the most recently used page.
         stack.insert(0, page)
 
     return page_faults
