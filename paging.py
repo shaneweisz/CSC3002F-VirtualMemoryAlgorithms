@@ -5,9 +5,6 @@ import sys
 from random import randint
 
 
-# CONSIDER REORDERING LOOPS, PUT CHECK FOR PAGE IN QUEUE FIRST
-
-
 def FIFO(size, pages):
     """
     Function that implements the FIFO page replacement algorithm and
@@ -76,41 +73,42 @@ def OPT(size, pages):
         int: The number of page faults that occured.
     """
 
+    frames = []                  # represent the frames in physical memory
     page_faults = 0              # tracks the number of page faults
-    frames = []                  # represent frames in physical memory
 
-    for page_index, page in enumerate(pages):  # loop through the page ref str
-        if len(frames) < size:        # check if there are any free frames
-            if page not in frames:
-                page_faults += 1      # a page fault has occurred
-                frames.append(page)   # place the new page in a free frame
-        else:
-            if page not in frames:
-                page_faults += 1    # page is not in the frames, so page fault
+    for (page_index, page) in enumerate(pages):  # loop through page ref string
+        if page not in frames:        # check if the page is in memory already
+            page_faults += 1            # if not, a page fault has occurred
+            if len(frames) < size:    # check if there are any free frames
+                frames.append(page)     # if so, place page in a free frame
+            else:
+                # the frames are full, so we must replace the frame
+                # that will not be used for the longest period of time
 
-                # we must replace the frame that will not be used for the
-                # longest period of time
-                frame_to_replace = frames[0]  # initialize to first frame
-                max_time_till_use = 0         # initialize to zero
+                frame_to_replace = frames[0]        # initialize to first frame
+                max_time_till_use = 0               # initialize to zero
                 upcoming_pages = pages[page_index+1:]
 
+                # loop through frames in memory to find the frame to replace
                 for frame in frames:
-                    # check if this frame has the current longest time till use
-                    for i, upcoming_page in enumerate(upcoming_pages):
-                        if frame == upcoming_page:
-                            time_till_use = i + 1  # since i starts at 0
-                            break
-                    else:
-                        # if we get here, this page frame is not referenced
-                        # anymore in the reference string,
-                        # so we have found our frame to replace
+                    # check if the frame will not be used in the near future
+                    # if so, we can replace this frame
+                    if frame not in upcoming_pages:
                         frame_to_replace = frame
                         break
+
+                    # find the next usage and time until the frame is next used
+                    for (i, upcoming_page) in enumerate(upcoming_pages, 1):
+                        if frame == upcoming_page:
+                            time_till_use = i
+                            break
+
+                    # check if this frame has the current longest time till use
                     if time_till_use > max_time_till_use:
                         max_time_till_use = time_till_use
                         frame_to_replace = frame
 
-                # replace the old frame with the new page to access
+                # replace the chosen frame with the new page
                 pos = frames.index(frame_to_replace)
                 frames.remove(frame_to_replace)
                 frames.insert(pos, page)
